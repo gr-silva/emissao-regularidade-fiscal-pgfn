@@ -1,5 +1,10 @@
-export const URL = "https://www.regularize.pgfn.gov.br/";
-export const BROWSER_OPTIONS = {
+const baseUrl =
+  "https://solucoes.receita.fazenda.gov.br/Servicos/certidaointernet";
+
+const PJ_URL = `${baseUrl}/PJ/EmitirPGFN`;
+const PF_URL = `${baseUrl}/PF/EmitirPGFN`;
+
+const BROWSER_OPTIONS = {
   headless: false,
   defaultViewport: {
     width: 1366,
@@ -14,3 +19,5 @@ export const BROWSER_OPTIONS = {
     "--disable-features=IsolateOrigins,site-per-process",
   ],
 };
+
+module.exports = { PJ_URL, PF_URL, BROWSER_OPTIONS };
