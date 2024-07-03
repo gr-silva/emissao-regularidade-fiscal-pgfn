@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cpf-cnpj-validator": "^1.0.3",
     "express": "^4.19.2",
     "puppeteer": "^22.12.1",
     "puppeteer-extra": "^3.3.6",
