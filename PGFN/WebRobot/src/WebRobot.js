@@ -102,6 +102,22 @@ class WebRobot {
   }
 
   /**
+   * It waits until the element is not present in the DOM
+   * @param selector - The selector of the element you want to wait for.
+   * @param [timeout=10] - The time in seconds to wait for the element to vanish.
+   * @returns A promise that resolves to true if the element vanishes, or throw a error if it doesn't.
+   */
+  async waitUntilVanish(selector, timeout = 10) {
+    if (!timeout) throw new Error("ELEMENTO NAO DESAPARECEU");
+    const element = await this._page.$(selector);
+    if (element) {
+      await this.delay(10);
+      return await this.waitUntilVanish(selector, timeout - 0.01);
+    }
+    return true;
+  }
+
+  /**
    * The _verifyText function compares the text value of a specified element on a
    * webpage with a given text input after removing non-alphanumeric characters, and
    * returns true if they match, otherwise false.
