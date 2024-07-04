@@ -23,33 +23,31 @@ class PGFN {
     }
   }
 
-  async start(LIMITER = 3) {
+  async _start(LIMITER = 3) {
     if (!LIMITER) throw new Error("Portal fora do ar.");
+    const idCodeInput = this._selectors.INPUTS.ID_CODE;
+    const url =
+      this._processmentType === "PF" ? configs.PF_URL : configs.PJ_URL;
     try {
-      if (this._processmentType === "PF") {
-        await this._robot.start(configs.PF_URL, configs.BROWSER_OPTIONS);
-        await this._robot.waitForSelector(this._selectors.INPUTS.ID_CODE);
-        return "Site da PGFN acessado com sucesso.";
+      if (this._processmentType !== "PF" && this._processmentType !== "PJ") {
+        return "CPF ou CNPJ Inválido.";
       }
-      if (this._processmentType === "PJ") {
-        await this._robot.start(configs.PJ_URL, configs.BROWSER_OPTIONS);
-        await this._robot.waitForSelector(this._selectors.INPUTS.ID_CODE);
-        return "Site da PGFN acessado com sucesso.";
-      }
-      return "CPF ou CNPJ Inválido.";
+      await this._robot.start(url, configs.BROWSER_OPTIONS);
+      await this._robot.waitForSelector(idCodeInput);
+      return "Site da PGFN acessado com sucesso.";
     } catch (error) {
       console.log(error);
-      return await start(--LIMITER);
+      return await _start(--LIMITER);
     }
   }
 
   async generateTaxRegularityCertificate() {
-    await this.start();
+    await this._start();
     for (const idCode of this._idCodes) {
       console.log(idCode);
     }
 
-    await this._robot.close()
+    await this._robot.close();
   }
 }
 
