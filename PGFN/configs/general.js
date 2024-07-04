@@ -20,4 +20,6 @@ const BROWSER_OPTIONS = {
   ],
 };
 
-module.exports = { PJ_URL, PF_URL, BROWSER_OPTIONS };
+const DOWNLOAD_PATH = "./downloads";
+
+module.exports = { PJ_URL, PF_URL, BROWSER_OPTIONS, DOWNLOAD_PATH };

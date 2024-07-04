@@ -1,6 +1,6 @@
 .DS_Store
 mock.js
-
+downloads/*.pdf
 # Logs
 logs
 *.log
