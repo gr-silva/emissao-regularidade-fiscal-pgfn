@@ -308,7 +308,8 @@ class WebRobot {
    */
   async setDownloadPath(pathToSave) {
     const downloadPath = path.resolve(String(`${pathToSave}`));
-    await this._page._client.send("Page.setDownloadBehavior", {
+    const client = await this._page.target().createCDPSession();
+    await client.send("Page.setDownloadBehavior", {
       behavior: "allow",
       downloadPath,
     });
