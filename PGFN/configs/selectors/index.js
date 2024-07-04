@@ -18,4 +18,6 @@ const MESSAGES = {
   ERROR_MESSAGE: "#mensagem",
 };
 
-module.exports = { INPUTS, BUTTONS, MODALS, MESSAGES };
+const LOADING = "body";
+
+module.exports = { INPUTS, BUTTONS, MODALS, MESSAGES, LOADING };
