@@ -27,11 +27,13 @@ class PGFN {
     if (!LIMITER) throw new Error("Portal fora do ar.");
     try {
       if (this._processmentType === "PF") {
-        this._robot.start(configs.PF_URL, configs.BROWSER_OPTIONS);
+        await this._robot.start(configs.PF_URL, configs.BROWSER_OPTIONS);
+        await this._robot.waitForSelector(this._selectors.INPUTS.ID_CODE);
         return "Site da PGFN acessado com sucesso.";
       }
       if (this._processmentType === "PJ") {
-        this._robot.start(configs.PJ_URL, configs.BROWSER_OPTIONS);
+        await this._robot.start(configs.PJ_URL, configs.BROWSER_OPTIONS);
+        await this._robot.waitForSelector(this._selectors.INPUTS.ID_CODE);
         return "Site da PGFN acessado com sucesso.";
       }
       return "CPF ou CNPJ Inválido.";
@@ -46,6 +48,8 @@ class PGFN {
     for (const idCode of this._idCodes) {
       console.log(idCode);
     }
+
+    await this._robot.close()
   }
 }
 
