@@ -24,19 +24,25 @@ class PGFN {
   }
 
   async start(LIMITER = 3) {
-    //TODO: IMPLEMENTAR VERIFICACAO DE ERROS E TENTATIVAS
-    if (this._processmentType === "PF") {
-      this._robot.start(configs.PF_URL, configs.BROWSER_OPTIONS);
+    if (!LIMITER) throw new Error("Portal fora do ar.");
+    try {
+      if (this._processmentType === "PF") {
+        this._robot.start(configs.PF_URL, configs.BROWSER_OPTIONS);
+        return "Site da PGFN acessado com sucesso.";
+      }
+      if (this._processmentType === "PJ") {
+        this._robot.start(configs.PJ_URL, configs.BROWSER_OPTIONS);
+        return "Site da PGFN acessado com sucesso.";
+      }
+      return "CPF ou CNPJ Inválido.";
+    } catch (error) {
+      console.log(error);
+      return await start(--LIMITER);
     }
-    if (this._processmentType === "PJ") {
-      this._robot.start(configs.PJ_URL, configs.BROWSER_OPTIONS);
-    }
-
-    return "CPF ou CNPJ Inválido.";
   }
 
   async generateTaxRegularityCertificate() {
-    // await this.start();
+    await this.start();
     for (const idCode of this._idCodes) {
       console.log(idCode);
     }
