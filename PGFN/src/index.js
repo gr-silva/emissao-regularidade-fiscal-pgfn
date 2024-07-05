@@ -50,7 +50,8 @@ class PGFN {
       await this.__fillIdCode(idCode);
       await this._robot.click(consultButton);
       await this.__waitForLoading();
-      //TODO: IMPLEMENTAR CHECAGEM SE CERTIDÃO JÁ FOI EMITIDA. CASO TENHA SIDO, CLICAR PARA EMITIR NOVA CERTIDÃO.
+      await this.__reissueCertificate();
+      await this.__waitForLoading();
       await this._robot.delay(1000);
       await this._robot.verifyDownload(configs.DOWNLOAD_PATH);
       await this._robot.click(newConsultButton);
@@ -59,10 +60,18 @@ class PGFN {
     }
   }
 
+  async __reissueCertificate() {
+    const issueNewCertificateButton =
+      this._selectors.BUTTONS.ISSUE_NEW_CERTIFICATE;
+    if (await this._robot.findElement(issueNewCertificateButton)) {
+      await this._robot.click(issueNewCertificateButton);
+    }
+  }
+
   async __waitForLoading() {
     const loading = this._selectors.LOADING;
+    console.log("Aguardando página carregar...");
     await this._robot.delay(500);
-
     const isLoading = await this._robot.getElementAttribute(loading, "class");
     if (isLoading) {
       return await this.__waitForLoading();
