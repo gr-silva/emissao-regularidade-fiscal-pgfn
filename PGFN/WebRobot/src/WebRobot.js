@@ -21,8 +21,9 @@ class WebRobot {
     const userAgent = randomUserAgent.getRandom(function (ua) {
       return parseFloat(ua.browserVersion) >= 121;
     });
-    const UA = userAgent || defaultUserAgent;
-    return UA;
+    return defaultUserAgent;
+    // const UA = userAgent || defaultUserAgent;
+    // return UA;
   }
 
   /**
@@ -262,13 +263,31 @@ class WebRobot {
   }
 
   /**
-   * It gets the text of an element
-   * @param selector - The CSS selector of the element you want to get the text from.
-   * @returns The text content of the element.
+   * The function `getElementText` asynchronously retrieves the text content of an
+   * element selected by a given selector.
+   * @param selector - The `selector` parameter is a string that represents a CSS
+   * selector used to locate the element in the DOM (Document Object Model). It is
+   * used to identify the element that you want to retrieve the text content from.
+   * @returns The `getElementText` function returns the text content of the element
+   * selected by the provided selector.
    */
   async getElementText(selector) {
     const element = await this._page.$(selector);
     return (await element.getProperty("textContent")).jsonValue();
+  }
+
+  /**
+   * The function `getElementInnerText` asynchronously retrieves the inner text
+   * content of an element selected by a given selector.
+   * @param selector - The `selector` parameter in the `getElementInnerText`
+   * function is a string that represents a CSS selector used to locate the HTML
+   * element whose inner text content you want to retrieve asynchronously.
+   * @returns The `getElementInnerText` function returns the inner text content of
+   * the element selected by the provided selector.
+   */
+  async getElementInnerText(selector) {
+    const element = await this._page.$(selector);
+    return (await element.getProperty("innerText")).jsonValue();
   }
 
   /**
