@@ -39,7 +39,7 @@ class PGFN {
       await this._robot.delay(2000);
       return "Site da PGFN acessado com sucesso.";
     } catch (error) {
-      return await _start(--LIMITER);
+      return await this._start(--LIMITER);
     }
   }
 
