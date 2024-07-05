@@ -9,6 +9,7 @@ class WebRobot {
     this._timeout = timeout;
     this._browser = "";
     this._page = "";
+    this._client = "";
   }
 
   /**
@@ -322,13 +323,22 @@ class WebRobot {
   }
 
   /**
+   * The `refresh` function asynchronously reloads the current page.
+   * @returns The `refresh` function is returning a promise that resolves to the
+   * result of calling the `reload` method on the `_page` object.
+   */
+  async refreshPage() {
+    return await this._page.reload();
+  }
+
+  /**
    * This function sets the download path for the browser
    * @param pathToSave - The path to save the file to.
    */
   async setDownloadPath(pathToSave) {
     const downloadPath = path.resolve(String(`${pathToSave}`));
-    const client = await this._page.target().createCDPSession();
-    await client.send("Page.setDownloadBehavior", {
+    this._client = await this._page.target().createCDPSession();
+    await this._client.send("Page.setDownloadBehavior", {
       behavior: "allow",
       downloadPath,
     });
