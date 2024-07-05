@@ -44,6 +44,7 @@ class PGFN {
   }
 
   async _consultIdCode(LIMITER = 3) {
+    if (!LIMITER) throw new Error("Erro ao consultar CPF ou CNPJ.");
     const idCodeInput = this._selectors.INPUTS.ID_CODE;
     const consultButton = this._selectors.BUTTONS.CONSULT;
 
@@ -53,14 +54,13 @@ class PGFN {
       await this._robot.click(consultButton);
       const { hasError, message } = await this.__handleIdCodeError();
       if (hasError) {
+        LIMITER = 0;
         throw new Error(message);
       }
       await this.__waitForLoading();
     } catch (error) {
-      console.log(error.message);
       if (!LIMITER) throw new Error(error.message);
-      await this._robot.close();
-      await this._start(--LIMITER);
+      await this._robot.refreshPage();
       return await this._consultIdCode(--LIMITER);
     }
   }
@@ -85,10 +85,8 @@ class PGFN {
       await this._robot.click(newConsultButton);
       //TODO: ADICIONAR RETORNO DA FUNÇÃO DE CONSULTA PARA O OBJETO ESPECIFICADO
     } catch (error) {
-      console.log(error.message);
-      await this._robot.close();
-      await this._start(--LIMITER);
-      await this._consultIdCode(--LIMITER);
+      await this._robot.refreshPage();
+      await this._consultIdCode(LIMITER - 1);
       return await this._downloadTaxRegularityCertificate(--LIMITER);
     }
   }
@@ -121,7 +119,6 @@ class PGFN {
   }
 
   async __handleIdCodeError() {
-    //FIXME: Verificar o motivo de não estar conseguindo retornar a mensagem do erro
     const errorModal = this._selectors.MODALS.ERROR;
     const errorMessage = this._selectors.MESSAGES.ERROR_MESSAGE;
     console.log("Verificando erros no CPF ou CNPJ...");
@@ -133,26 +130,49 @@ class PGFN {
       );
       if (!styleMessage.includes("display: none;")) {
         const message = await this._robot.getElementText(errorMessage);
-        console.log(message);
-        return { error: true, message: message };
+        console.error(message);
+        return { hasError: true, message: message };
       }
     }
-    console.log("Não encontrei o modal de erro.");
-    return { error: false, message: "" };
+    return { hasError: false, message: "" };
   }
 
   async generateTaxRegularityCertificate() {
+    const idCodesProcessmentReturn = {};
     await this._start();
     await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
+
     for (const idCode of this._idCodes) {
       this._idCode = idCode;
       console.log(this._idCode);
-      await this._consultIdCode();
-      await this._downloadTaxRegularityCertificate();
-      await this._robot.delay(5000);
+
+      try {
+        await this._consultIdCode();
+        await this._downloadTaxRegularityCertificate();
+
+        idCodesProcessmentReturn[this._idCode] = {
+          status: "sucesso",
+          certidao: "http://link.com.br",
+          motivo_erro: null,
+        };
+
+        await this._robot.delay(1000);
+      } catch (error) {
+        idCodesProcessmentReturn[this._idCode] = {
+          status: "falha",
+          certidao: null,
+          motivo_erro: String(error.message),
+        };
+
+        await this._robot.refreshPage();
+        await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
+      }
     }
 
     await this._robot.close();
+    console.log(idCodesProcessmentReturn);
+    console.log(JSON.parse(JSON.stringify(idCodesProcessmentReturn)));
+    return JSON.parse(JSON.stringify(idCodesProcessmentReturn));
   }
 }
 
