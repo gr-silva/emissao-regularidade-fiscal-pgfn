@@ -14,10 +14,16 @@ const MODALS = {
     "body > div.ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-dialog-buttons.ui-draggable",
 };
 
+const TITLES = {
+  RESULT_OF_CONSULT:
+    "#main-container > div > table > tbody > tr > td > h3:nth-child(2)",
+};
+
 const MESSAGES = {
   ERROR_MESSAGE: "#mensagem",
+  RESULT_OF_CONSULT: "#main-container > div > table > tbody > tr > td",
 };
 
 const LOADING = "body";
 
-module.exports = { INPUTS, BUTTONS, MODALS, MESSAGES, LOADING };
+module.exports = { INPUTS, BUTTONS, MODALS, MESSAGES, LOADING, TITLES };

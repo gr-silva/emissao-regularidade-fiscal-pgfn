@@ -68,19 +68,37 @@ class PGFN {
   async _downloadTaxRegularityCertificate(LIMITER = 3) {
     if (!LIMITER) throw new Error("Erro ao consultar certidão.");
     const newConsultButton = this._selectors.BUTTONS.NEW_CONSULT;
+    const message = this._selectors.MESSAGES.RESULT_OF_CONSULT;
 
     try {
       await this.__reissueCertificate();
       await this.__waitForLoading();
       await this._robot.delay(1000);
-      await this._robot.verifyDownload(configs.DOWNLOAD_PATH);
+      const consultMessage = await this._robot.getElementAttribute(
+        message,
+        "innerText"
+      );
+
+      if (consultMessage.includes("certidão foi emitida com sucesso")) {
+        await this._robot.verifyDownload(
+          configs.DOWNLOAD_PATH,
+          `${this._idCode}.pdf`
+        );
+      }
+
       await this._robot.click(newConsultButton);
+      //TODO: ADICIONAR RETORNO DA FUNÇÃO DE CONSULTA PARA O OBJETO ESPECIFICADO
     } catch (error) {
       await this._robot.close();
       await this._start(--LIMITER);
       await this._consultIdCode(--LIMITER);
       return await this._downloadTaxRegularityCertificate(--LIMITER);
     }
+  }
+
+  async __waitForResultOfConsult() {
+    const resultOfConsultTitle = this._selectors.TITLES.RESULT_OF_CONSULT;
+    await this._robot.waitForSelector(resultOfConsultTitle);
   }
 
   async __reissueCertificate() {
@@ -115,11 +133,13 @@ class PGFN {
         errorModal,
         "style"
       );
+      console.log(styleMessage);
       if (!styleMessage.includes("display: none;")) {
         const message = await this._robot.getElementText(errorMessage);
         return { error: true, message: message };
       }
     }
+    console.log("Não encontrei o modal de erro.");
     return { error: false, message: "" };
   }
 
