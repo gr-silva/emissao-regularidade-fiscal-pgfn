@@ -57,8 +57,14 @@ class PGFN {
         LIMITER = 0;
         throw new Error(message);
       }
+      await this.__handleNetError();
       await this.__waitForLoading();
     } catch (error) {
+      if (error.message.includes("mais tarde")) {
+        await this._robot.refreshPage();
+        return await this._consultIdCode((LIMITER = 3));
+      }
+
       if (!LIMITER) throw new Error(error.message);
       await this._robot.refreshPage();
       return await this._consultIdCode(--LIMITER);
@@ -80,15 +86,27 @@ class PGFN {
           configs.DOWNLOAD_PATH,
           `${this._idCode}.pdf`
         );
+      } else {
+        LIMITER = 0;
+        throw new Error(consultMessage);
       }
-
+      await this.__handleNetError();
       await this._robot.click(newConsultButton);
-      //TODO: ADICIONAR RETORNO DA FUNÇÃO DE CONSULTA PARA O OBJETO ESPECIFICADO
     } catch (error) {
+      if (!LIMITER) throw new Error(error.message);
       await this._robot.refreshPage();
       await this._consultIdCode(LIMITER - 1);
       return await this._downloadTaxRegularityCertificate(--LIMITER);
     }
+  }
+
+  async __handleNetError() {
+    const netError = this._selectors.MESSAGES.NET_ERROR;
+    try {
+      await this._robot.waitForSelector(netError, 1500);
+      await this._robot.refreshPage();
+      return await this.__handleNetError();
+    } catch (error) {}
   }
 
   async __waitForResultOfConsult() {
@@ -102,9 +120,7 @@ class PGFN {
     try {
       await this._robot.waitForSelector(issueNewCertificateButton, 2000);
       await this._robot.click(issueNewCertificateButton);
-    } catch (error) {
-      console.log("");
-    }
+    } catch (error) {}
   }
 
   async __waitForLoading() {
@@ -156,7 +172,7 @@ class PGFN {
           motivo_erro: null,
         };
 
-        await this._robot.delay(1000);
+        await this._robot.delay(5000);
       } catch (error) {
         idCodesProcessmentReturn[this._idCode] = {
           status: "falha",
@@ -171,8 +187,7 @@ class PGFN {
 
     await this._robot.close();
     console.log(idCodesProcessmentReturn);
-    console.log(JSON.parse(JSON.stringify(idCodesProcessmentReturn)));
-    return JSON.parse(JSON.stringify(idCodesProcessmentReturn));
+    return idCodesProcessmentReturn;
   }
 }
 

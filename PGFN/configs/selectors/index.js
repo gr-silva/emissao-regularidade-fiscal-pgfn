@@ -22,6 +22,7 @@ const TITLES = {
 const MESSAGES = {
   ERROR_MESSAGE: "#mensagem",
   RESULT_OF_CONSULT: "#main-container > div > table > tbody > tr > td",
+  NET_ERROR: "#main-message > h1 > span",
 };
 
 const LOADING = "body";
