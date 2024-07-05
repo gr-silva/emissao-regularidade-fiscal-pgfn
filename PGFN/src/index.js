@@ -74,11 +74,7 @@ class PGFN {
       await this.__reissueCertificate();
       await this.__waitForLoading();
       await this._robot.delay(1000);
-      const consultMessage = await this._robot.getElementAttribute(
-        message,
-        "innerText"
-      );
-
+      const consultMessage = await this._robot.getElementInnerText(message);
       if (consultMessage.includes("certidão foi emitida com sucesso")) {
         await this._robot.verifyDownload(
           configs.DOWNLOAD_PATH,
@@ -89,6 +85,7 @@ class PGFN {
       await this._robot.click(newConsultButton);
       //TODO: ADICIONAR RETORNO DA FUNÇÃO DE CONSULTA PARA O OBJETO ESPECIFICADO
     } catch (error) {
+      console.log(error.message);
       await this._robot.close();
       await this._start(--LIMITER);
       await this._consultIdCode(--LIMITER);
@@ -120,6 +117,7 @@ class PGFN {
     if (isLoading === "loading") {
       return await this.__waitForLoading();
     }
+    await this._robot.delay(500);
   }
 
   async __handleIdCodeError() {
@@ -133,9 +131,9 @@ class PGFN {
         errorModal,
         "style"
       );
-      console.log(styleMessage);
       if (!styleMessage.includes("display: none;")) {
         const message = await this._robot.getElementText(errorMessage);
+        console.log(message);
         return { error: true, message: message };
       }
     }
