@@ -7,6 +7,7 @@ class PGFN {
     this._timeout = timeout;
     this._browser = "";
     this._page = "";
+    this._idCode = "";
     this._robot = new WebRobot(timeout);
     this._selectors = selectors;
     this._idCodes = idCodes;
@@ -35,68 +36,101 @@ class PGFN {
       }
       await this._robot.start(url, configs.BROWSER_OPTIONS);
       await this._robot.waitForSelector(idCodeInput);
+      await this._robot.delay(2000);
       return "Site da PGFN acessado com sucesso.";
     } catch (error) {
       return await _start(--LIMITER);
     }
   }
 
-  async _consultTaxRegularityCertificate(idCode, LIMITER = 3) {
-    if (!LIMITER) throw new Error("Erro ao consultar certidão.");
+  async _consultIdCode(LIMITER = 3) {
+    const idCodeInput = this._selectors.INPUTS.ID_CODE;
     const consultButton = this._selectors.BUTTONS.CONSULT;
+
+    try {
+      await this._robot.setText(this._idCode, idCodeInput, true);
+      await this._robot.delay(500);
+      await this._robot.click(consultButton);
+      const { hasError, message } = await this.__handleIdCodeError();
+      if (hasError) {
+        throw new Error(message);
+      }
+      await this.__waitForLoading();
+    } catch (error) {
+      console.log(error.message);
+      if (!LIMITER) throw new Error(error.message);
+      await this._robot.close();
+      await this._start(--LIMITER);
+      return await this._consultIdCode(--LIMITER);
+    }
+  }
+
+  async _downloadTaxRegularityCertificate(LIMITER = 3) {
+    if (!LIMITER) throw new Error("Erro ao consultar certidão.");
     const newConsultButton = this._selectors.BUTTONS.NEW_CONSULT;
 
     try {
-      await this.__fillIdCode(idCode);
-      await this._robot.click(consultButton);
-      await this.__waitForLoading();
       await this.__reissueCertificate();
       await this.__waitForLoading();
       await this._robot.delay(1000);
       await this._robot.verifyDownload(configs.DOWNLOAD_PATH);
       await this._robot.click(newConsultButton);
     } catch (error) {
-      return await this._consultTaxRegularityCertificate(idCode, --LIMITER);
+      await this._robot.close();
+      await this._start(--LIMITER);
+      await this._consultIdCode(--LIMITER);
+      return await this._downloadTaxRegularityCertificate(--LIMITER);
     }
   }
 
   async __reissueCertificate() {
     const issueNewCertificateButton =
       this._selectors.BUTTONS.ISSUE_NEW_CERTIFICATE;
-    if (await this._robot.findElement(issueNewCertificateButton)) {
+    try {
+      await this._robot.waitForSelector(issueNewCertificateButton, 2000);
       await this._robot.click(issueNewCertificateButton);
+    } catch (error) {
+      console.log("");
     }
   }
 
   async __waitForLoading() {
     const loading = this._selectors.LOADING;
     console.log("Aguardando página carregar...");
-    await this._robot.delay(500);
+    await this._robot.delay(1000);
     const isLoading = await this._robot.getElementAttribute(loading, "class");
-    if (isLoading) {
+    if (isLoading === "loading") {
       return await this.__waitForLoading();
     }
-    return true;
   }
 
-  async __fillIdCode(idCode, LIMITER = 3) {
-    if (!LIMITER) throw new Error("Erro ao inserir CPF ou CNPJ.");
-    const idCodeInput = this._selectors.INPUTS.ID_CODE;
-
-    try {
-      await this._robot.setText(idCode, idCodeInput, true);
-    } catch (error) {
-      return await this.__fillIdCode(--LIMITER);
+  async __handleIdCodeError() {
+    //FIXME: Verificar o motivo de não estar conseguindo retornar a mensagem do erro
+    const errorModal = this._selectors.MODALS.ERROR;
+    const errorMessage = this._selectors.MESSAGES.ERROR_MESSAGE;
+    console.log("Verificando erros no CPF ou CNPJ...");
+    await this._robot.delay(1000);
+    if (await this._robot.findElement(errorModal)) {
+      const styleMessage = await this._robot.getElementAttribute(
+        errorModal,
+        "style"
+      );
+      if (!styleMessage.includes("display: none;")) {
+        const message = await this._robot.getElementText(errorMessage);
+        return { error: true, message: message };
+      }
     }
+    return { error: false, message: "" };
   }
 
   async generateTaxRegularityCertificate() {
     await this._start();
     await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
     for (const idCode of this._idCodes) {
-      console.log(idCode);
-      await this._robot.delay(2000);
-      await this._consultTaxRegularityCertificate(idCode);
+      this._idCode = idCode;
+      console.log(this._idCode);
+      await this._consultIdCode();
+      await this._downloadTaxRegularityCertificate();
       await this._robot.delay(5000);
     }
 
