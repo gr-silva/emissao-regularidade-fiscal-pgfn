@@ -1,7 +1,6 @@
 const path = require("path");
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-const randomUserAgent = require("random-useragent");
 const fs = require("fs");
 
 class WebRobot {
@@ -17,14 +16,10 @@ class WebRobot {
    * @returns A random user agent string.
    */
   _changeRandomUserAgent() {
-    const defaultUserAgent =
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
-    const userAgent = randomUserAgent.getRandom(function (ua) {
-      return parseFloat(ua.browserVersion) >= 121;
-    });
-    return defaultUserAgent;
-    // const UA = userAgent || defaultUserAgent;
-    // return UA;
+    const versionsAllowed = [121, 122, 123, 124, 125, 126];
+    const randomVersionAllowed = versionsAllowed[Math.floor(Math.random() * 6)];
+    const userAgent = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${randomVersionAllowed}.0.0.0 Safari/537.36`;
+    return userAgent;
   }
 
   /**
