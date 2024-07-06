@@ -95,6 +95,8 @@ fetch("http://localhost:3000/gerar-certidoes", {
 3. Receba a resposta com o status de cada solicitação, links para download e motivos de erros
 
 ```json
+//Exemplo de resposta
+
 {
   "12345678901": {
     "status": "sucesso",
