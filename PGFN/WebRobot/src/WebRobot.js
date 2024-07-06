@@ -12,13 +12,16 @@ class WebRobot {
   }
 
   /**
-   * It changes the user agent of the browser.
-   * @returns A random user agent string.
+   * The function generates a random user agent string with a specific Chrome
+   * version from a predefined list.
+   * @returns a randomly generated user agent string with a Chrome version number
+   * selected from the array `[124, 125, 126]`.
    */
   _changeRandomUserAgent() {
-    const versionsAllowed = [124, 125, 126];
-    const randomVersionAllowed = versionsAllowed[Math.floor(Math.random() * 3)];
-    const userAgent = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${randomVersionAllowed}.0.0.0 Safari/537.36`;
+    const allowedVersions = [124, 125, 126];
+    const randomAllowedVersions =
+      allowedVersions[Math.floor(Math.random() * 3)];
+    const userAgent = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${randomAllowedVersions}.0.0.0 Safari/537.36`;
     return userAgent;
   }
 
