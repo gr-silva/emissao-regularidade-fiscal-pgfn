@@ -5,17 +5,17 @@ const s3Client = require("../AWS/s3Client");
 const path = require("path");
 
 class PGFN {
-  constructor(idCodes = [], processmentType = "", timeout = 30000) {
+  constructor(documentNumbers = [], processmentType = "", timeout = 30000) {
     this._timeout = timeout;
     this._browser = "";
     this._page = "";
-    this._idCode = "";
+    this._documentNumber = "";
     this._robot = new WebRobot(timeout);
     this._selectors = selectors;
-    this._idCodes = idCodes;
+    this._documentNumbers = documentNumbers;
     this._processmentType = processmentType;
 
-    if (this._idCodes.length === 0) {
+    if (this._documentNumbers.length === 0) {
       throw new Error("Nenhuma lista com CPF ou CNPJ foi informado.");
     }
 
@@ -28,7 +28,7 @@ class PGFN {
 
   async _start(LIMITER = 3) {
     if (!LIMITER) throw new Error("Portal fora do ar.");
-    const idCodeInput = this._selectors.INPUTS.ID_CODE;
+    const documentNumberInput = this._selectors.INPUTS.ID_CODE;
     const url =
       this._processmentType === "PF" ? configs.PF_URL : configs.PJ_URL;
 
@@ -37,7 +37,7 @@ class PGFN {
         return "CPF ou CNPJ Inválido.";
       }
       await this._robot.start(url, configs.BROWSER_OPTIONS);
-      await this._robot.waitForSelector(idCodeInput);
+      await this._robot.waitForSelector(documentNumberInput);
       await this._robot.delay(2000);
       return "Site da PGFN acessado com sucesso.";
     } catch (error) {
@@ -47,16 +47,20 @@ class PGFN {
     }
   }
 
-  async _consultIdCode(LIMITER = 3) {
+  async _consultDocumentNumber(LIMITER = 3) {
     if (!LIMITER) throw new Error("Erro ao consultar CPF ou CNPJ.");
-    const idCodeInput = this._selectors.INPUTS.ID_CODE;
+    const documentNumberInput = this._selectors.INPUTS.ID_CODE;
     const consultButton = this._selectors.BUTTONS.CONSULT;
 
     try {
-      await this._robot.setText(this._idCode, idCodeInput, true);
+      await this._robot.setText(
+        this._documentNumber,
+        documentNumberInput,
+        true
+      );
       await this._robot.delay(1000);
       await this._robot.click(consultButton);
-      const { hasError, message } = await this.__handleIdCodeError();
+      const { hasError, message } = await this.__handleDocumentNumberError();
       if (hasError) {
         LIMITER = 0;
         throw new Error(message);
@@ -67,7 +71,7 @@ class PGFN {
       if (!LIMITER) throw new Error(error.message);
       await this._robot.refreshPage();
       await this.__handleNetError();
-      return await this._consultIdCode(--LIMITER);
+      return await this._consultDocumentNumber(--LIMITER);
     }
   }
 
@@ -84,7 +88,7 @@ class PGFN {
       if (consultMessage.includes("certidão foi emitida com sucesso")) {
         await this._robot.verifyDownload(
           configs.DOWNLOAD_PATH,
-          `${this._idCode}.pdf`
+          `${this._documentNumber}.pdf`
         );
       } else {
         LIMITER = 0;
@@ -96,7 +100,7 @@ class PGFN {
       if (!LIMITER) throw new Error(error.message);
       await this._robot.refreshPage();
       await this.__handleNetError();
-      await this._consultIdCode(LIMITER - 1);
+      await this._consultDocumentNumber(LIMITER - 1);
       return await this._downloadTaxRegularityCertificate(--LIMITER);
     }
   }
@@ -137,7 +141,7 @@ class PGFN {
     await this._robot.delay(500);
   }
 
-  async __handleIdCodeError() {
+  async __handleDocumentNumberError() {
     const errorModal = this._selectors.MODALS.ERROR;
     const errorMessage = this._selectors.MESSAGES.ERROR_MESSAGE;
     console.log("Verificando erros no CPF ou CNPJ...");
@@ -156,24 +160,24 @@ class PGFN {
   }
 
   async generateTaxRegularityCertificate() {
-    const idCodesProcessmentReturn = {};
+    const documentNumberProcessmentReturn = {};
 
-    for (const idCode of this._idCodes) {
-      this._idCode = idCode;
-      const fileName = `Certidao-${this._idCode}.pdf`;
-      console.log(this._idCode);
+    for (const documentNumber of this._documentNumbers) {
+      this._documentNumber = documentNumber;
+      const fileName = `Certidao-${this._documentNumber}.pdf`;
+      console.log(this._documentNumber);
 
       try {
         await this._start();
         await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
-        await this._consultIdCode();
+        await this._consultDocumentNumber();
         await this._downloadTaxRegularityCertificate();
         const s3FileUrl = await s3Client.uploadFile(
           fileName,
           path.resolve(String(configs.DOWNLOAD_PATH), fileName)
         );
 
-        idCodesProcessmentReturn[this._idCode] = {
+        documentNumberProcessmentReturn[this._documentNumber] = {
           status: "sucesso",
           certidao: s3FileUrl,
           motivo_erro: null,
@@ -184,7 +188,7 @@ class PGFN {
           .replace("Resultado da Consulta", "")
           .trim();
 
-        idCodesProcessmentReturn[this._idCode] = {
+        documentNumberProcessmentReturn[this._documentNumber] = {
           status: "falha",
           certidao: null,
           motivo_erro: errorMessage,
@@ -195,8 +199,8 @@ class PGFN {
       }
     }
 
-    console.log(idCodesProcessmentReturn);
-    return idCodesProcessmentReturn;
+    console.log(documentNumberProcessmentReturn);
+    return documentNumberProcessmentReturn;
   }
 }
 
