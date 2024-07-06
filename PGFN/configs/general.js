@@ -1,8 +1,15 @@
 const baseUrl =
   "https://solucoes.receita.fazenda.gov.br/Servicos/certidaointernet";
 
-const PJ_URL = `${baseUrl}/PJ/EmitirPGFN`;
-const PF_URL = `${baseUrl}/PF/EmitirPGFN`;
+const basePJUrl = `${baseUrl}/PJ`;
+const basePFUrl = `${baseUrl}/PF`;
+
+const PGFN_URLS = {
+  ISSUE_PJ: `${basePJUrl}/EmitirPGFN`,
+  ISSUE_PF: `${basePFUrl}/EmitirPGFN`,
+  AUTHENTICATE_PJ: `${basePJUrl}/AutenticidadePGFN/Confirmar`,
+  AUTHENTICATE_PF: `${basePFUrl}/AutenticidadePGFN/Confirmar`,
+};
 
 const BROWSER_OPTIONS = {
   headless: false,
@@ -22,4 +29,4 @@ const BROWSER_OPTIONS = {
 
 const DOWNLOAD_PATH = "./downloads";
 
-module.exports = { PJ_URL, PF_URL, BROWSER_OPTIONS, DOWNLOAD_PATH };
+module.exports = { PGFN_URLS, BROWSER_OPTIONS, DOWNLOAD_PATH };

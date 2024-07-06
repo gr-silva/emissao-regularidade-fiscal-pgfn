@@ -30,7 +30,9 @@ class PGFN {
     if (!LIMITER) throw new Error("Portal fora do ar.");
     const documentNumberInput = this._selectors.INPUTS.ID_CODE;
     const url =
-      this._processmentType === "PF" ? configs.PF_URL : configs.PJ_URL;
+      this._processmentType === "PF"
+        ? configs.PGFN_URLS.ISSUE_PF
+        : configs.PGFN_URLS.ISSUE_PJ;
 
     try {
       if (this._processmentType !== "PF" && this._processmentType !== "PJ") {
