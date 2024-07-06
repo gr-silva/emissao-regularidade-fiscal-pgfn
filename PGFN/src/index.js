@@ -5,19 +5,14 @@ const s3Client = require("../AWS/s3Client");
 const path = require("path");
 
 class PGFN {
-  constructor(documentNumbers = [], processmentType = "", timeout = 30000) {
+  constructor(documentNumber = "", processmentType = "", timeout = 30000) {
     this._timeout = timeout;
     this._browser = "";
     this._page = "";
-    this._documentNumber = "";
     this._robot = new WebRobot(timeout);
     this._selectors = selectors;
-    this._documentNumbers = documentNumbers;
+    this._documentNumber = documentNumber;
     this._processmentType = processmentType;
-
-    if (this._documentNumbers.length === 0) {
-      throw new Error("Nenhuma lista com CPF ou CNPJ foi informado.");
-    }
 
     if (this._processmentType !== "PF" && this._processmentType !== "PJ") {
       throw new Error(
@@ -164,44 +159,40 @@ class PGFN {
   async generateTaxRegularityCertificate() {
     const documentNumberProcessmentReturn = {};
 
-    for (const documentNumber of this._documentNumbers) {
-      this._documentNumber = documentNumber;
-      const fileName = `Certidao-${this._documentNumber}.pdf`;
-      console.log(this._documentNumber);
+    const fileName = `Certidao-${this._documentNumber}.pdf`;
+    console.log(this._documentNumber);
 
-      try {
-        await this._start();
-        await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
-        await this._consultDocumentNumber();
-        await this._downloadTaxRegularityCertificate();
-        const s3FileUrl = await s3Client.uploadFile(
-          fileName,
-          path.resolve(String(configs.DOWNLOAD_PATH), fileName)
-        );
+    try {
+      await this._start();
+      await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
+      await this._consultDocumentNumber();
+      await this._downloadTaxRegularityCertificate();
+      const s3FileUrl = await s3Client.uploadFile(
+        fileName,
+        path.resolve(String(configs.DOWNLOAD_PATH), fileName)
+      );
 
-        documentNumberProcessmentReturn[this._documentNumber] = {
-          status: "sucesso",
-          certidao: s3FileUrl,
-          motivo_erro: null,
-        };
-      } catch (error) {
-        const errorMessage = error.message
-          .replace(/\n/g, "")
-          .replace("Resultado da Consulta", "")
-          .trim();
+      documentNumberProcessmentReturn[this._documentNumber] = {
+        status: "sucesso",
+        certidao: s3FileUrl,
+        motivo_erro: null,
+      };
+    } catch (error) {
+      const errorMessage = error.message
+        .replace(/\n/g, "")
+        .replace("Resultado da Consulta", "")
+        .trim();
 
-        documentNumberProcessmentReturn[this._documentNumber] = {
-          status: "falha",
-          certidao: null,
-          motivo_erro: errorMessage,
-        };
-      } finally {
-        await this._robot.close();
-        await this._robot.delay(500 * Math.floor(Math.random() * 5));
-      }
+      documentNumberProcessmentReturn[this._documentNumber] = {
+        status: "falha",
+        certidao: null,
+        motivo_erro: errorMessage,
+      };
+    } finally {
+      await this._robot.close();
+      await this._robot.delay(500 * Math.floor(Math.random() * 5));
     }
 
-    console.log(documentNumberProcessmentReturn);
     return documentNumberProcessmentReturn;
   }
 }
