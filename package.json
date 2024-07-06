@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node -r dotenv/config src/index.js"
+    "server": "nodemon -r dotenv/config src/server.js"
   },
   "keywords": [],
   "author": "Gabriel Rocha",
@@ -17,5 +17,8 @@
     "puppeteer": "^22.12.1",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }
