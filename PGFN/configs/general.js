@@ -4,11 +4,15 @@ const baseUrl =
 const basePJUrl = `${baseUrl}/PJ`;
 const basePFUrl = `${baseUrl}/PF`;
 
-const PGFN_URLS = {
-  ISSUE_PJ: `${basePJUrl}/EmitirPGFN`,
-  ISSUE_PF: `${basePFUrl}/EmitirPGFN`,
-  AUTHENTICATE_PJ: `${basePJUrl}/AutenticidadePGFN/Confirmar`,
-  AUTHENTICATE_PF: `${basePFUrl}/AutenticidadePGFN/Confirmar`,
+const URLS = {
+  ISSUE: {
+    PJ: `${basePJUrl}/EmitirPGFN`,
+    PF: `${basePFUrl}/EmitirPGFN`,
+  },
+  AUTHENTICATE: {
+    PJ: `${basePJUrl}/AutenticidadePGFN/Confirmar`,
+    PF: `${basePFUrl}/AutenticidadePGFN/Confirmar`,
+  },
 };
 
 const BROWSER_OPTIONS = {
@@ -29,4 +33,4 @@ const BROWSER_OPTIONS = {
 
 const DOWNLOAD_PATH = "./downloads";
 
-module.exports = { PGFN_URLS, BROWSER_OPTIONS, DOWNLOAD_PATH };
+module.exports = { URLS, BROWSER_OPTIONS, DOWNLOAD_PATH };
