@@ -78,6 +78,8 @@ npm run server
 2. Envie uma requisição POST para `/gerar-certidoes` com um array de CPFs ou CNPJs no corpo da requisição
 
 ```JavaScript
+// Exemplo de requisição
+
 fetch("http://localhost:3000/gerar-certidoes", {
   method: "POST",
   headers: {
@@ -93,16 +95,18 @@ fetch("http://localhost:3000/gerar-certidoes", {
 3. Receba a resposta com o status de cada solicitação, links para download e motivos de erros
 
 ```json
+//Exemplo de resposta
+
 {
   "12345678901": {
     "status": "sucesso",
-    "link": "https://s3.amazonaws.com/emissao-regularidade-fiscal-pgfn/downloads/12345678901.pdf",
-    "motivo": null
+    "certidao": "https://s3.amazonaws.com/emissao-regularidade-fiscal-pgfn/Certidao-12345678901.pdf",
+    "motivo_erro": null
   },
   "12345678000199": {
     "status": "falha",
-    "link": null,
-    "motivo": "CPF ou CNPJ inválido."
+    "certidao": null,
+    "motivo_erro": "CPF ou CNPJ inválido."
   }
 }
 ```
