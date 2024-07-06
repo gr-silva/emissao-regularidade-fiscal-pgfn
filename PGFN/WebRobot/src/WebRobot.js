@@ -16,8 +16,8 @@ class WebRobot {
    * @returns A random user agent string.
    */
   _changeRandomUserAgent() {
-    const versionsAllowed = [121, 122, 123, 124, 125, 126];
-    const randomVersionAllowed = versionsAllowed[Math.floor(Math.random() * 6)];
+    const versionsAllowed = [124, 125, 126];
+    const randomVersionAllowed = versionsAllowed[Math.floor(Math.random() * 3)];
     const userAgent = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${randomVersionAllowed}.0.0.0 Safari/537.36`;
     return userAgent;
   }
