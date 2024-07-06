@@ -1,5 +1,12 @@
 const INPUTS = {
   ID_CODE: "#NI",
+  CONTROL_CODE: "#NumControleCertidao",
+  DATE_OF_ISSUE: "#DtEmissaoCertidao",
+  ISSUE_TIME: "#HoEmissaoCertidao",
+};
+
+const SELECTS = {
+  TYPE_OF_CERTIFICATE: "#TipoCertidaoStr",
 };
 
 const BUTTONS = {
@@ -27,4 +34,12 @@ const MESSAGES = {
 
 const LOADING = "body";
 
-module.exports = { INPUTS, BUTTONS, MODALS, MESSAGES, LOADING, TITLES };
+module.exports = {
+  INPUTS,
+  BUTTONS,
+  MODALS,
+  MESSAGES,
+  LOADING,
+  TITLES,
+  SELECTS,
+};

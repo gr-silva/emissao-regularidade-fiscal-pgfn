@@ -5,7 +5,12 @@ const s3Client = require("../AWS/s3Client");
 const path = require("path");
 
 class PGFN {
-  constructor(documentNumber = "", processmentType = "", timeout = 30000) {
+  constructor(
+    documentNumber = "",
+    processmentType = "",
+    timeout = 30000,
+    verifyAuthenticity = false
+  ) {
     this._timeout = timeout;
     this._browser = "";
     this._page = "";
@@ -13,6 +18,7 @@ class PGFN {
     this._selectors = selectors;
     this._documentNumber = documentNumber;
     this._processmentType = processmentType;
+    this._verifyAuthenticity = verifyAuthenticity;
 
     if (this._processmentType !== "PF" && this._processmentType !== "PJ") {
       throw new Error(
@@ -24,10 +30,17 @@ class PGFN {
   async _start(LIMITER = 3) {
     if (!LIMITER) throw new Error("Portal fora do ar.");
     const documentNumberInput = this._selectors.INPUTS.ID_CODE;
-    const url =
+    let url =
       this._processmentType === "PF"
-        ? configs.PGFN_URLS.ISSUE_PF
-        : configs.PGFN_URLS.ISSUE_PJ;
+        ? configs.URLS.ISSUE.PF
+        : configs.URLS.ISSUE.PJ;
+
+    if (this._verifyAuthenticity) {
+      url =
+        this._processmentType === "PF"
+          ? configs.URLS.AUTHENTICATE.PF
+          : configs.URLS.AUTHENTICATE.PJ;
+    }
 
     try {
       if (this._processmentType !== "PF" && this._processmentType !== "PJ") {
@@ -46,17 +59,11 @@ class PGFN {
 
   async _consultDocumentNumber(LIMITER = 3) {
     if (!LIMITER) throw new Error("Erro ao consultar CPF ou CNPJ.");
-    const documentNumberInput = this._selectors.INPUTS.ID_CODE;
-    const consultButton = this._selectors.BUTTONS.CONSULT;
 
     try {
-      await this._robot.setText(
-        this._documentNumber,
-        documentNumberInput,
-        true
-      );
+      await this.__insertDocumentNumber();
       await this._robot.delay(1000);
-      await this._robot.click(consultButton);
+      await this.__consult();
       const { hasError, message } = await this.__handleDocumentNumberError();
       if (hasError) {
         LIMITER = 0;
@@ -100,6 +107,47 @@ class PGFN {
       await this._consultDocumentNumber(LIMITER - 1);
       return await this._downloadTaxRegularityCertificate(--LIMITER);
     }
+  }
+
+  async _fillAuthenticityForm(
+    controlCode,
+    dateOfIssue,
+    issueTime,
+    typeOfCertificate
+  ) {
+    await this.__insertDocumentNumber();
+    await this.__insertControlCode();
+    await this.__insertDateOfIssue();
+    await this.__insertIssueTime();
+    await this.__selectTypeOfCertificate();
+    await this.__consult();
+  }
+
+  async __insertDocumentNumber() {
+    const documentNumberInput = this._selectors.INPUTS.ID_CODE;
+    await this._robot.setText(this._documentNumber, documentNumberInput, true);
+  }
+  async __insertControlCode(controlCode) {
+    const controlCodeInput = this._selectors.INPUTS.CONTROL_CODE;
+    await this._robot.setText(controlCode, controlCodeInput, true);
+  }
+  async __insertDateOfIssue(dateOfIssue) {
+    const dateOfIssueInput = this._selectors.INPUTS.DATE_OF_ISSUE;
+    await this._robot.setText(dateOfIssue, dateOfIssueInput, true);
+  }
+  async __insertIssueTime(issueTime) {
+    const issueTimeInput = this._selectors.INPUTS.ISSUE_TIME;
+    await this._robot.setText(issueTime, issueTimeInput, true);
+  }
+
+  async __selectTypeOfCertificate(typeOfCertificate) {
+    const typeOfCertificateSelect = this._selectors.SELECTS.TYPE_OF_CERTIFICATE;
+    await this._robot.select(typeOfCertificate, typeOfCertificateSelect);
+  }
+
+  async __consult() {
+    const consultButton = this._selectors.BUTTONS.CONSULT;
+    await this._robot.click(consultButton);
   }
 
   async __handleNetError() {
@@ -154,6 +202,30 @@ class PGFN {
       }
     }
     return { hasError: false, message: "" };
+  }
+
+  async confirmAuthenticityOfTaxRegularity(
+    controlCode,
+    dateOfIssue,
+    issueTime,
+    typeOfCertificate = "Negativa"
+  ) {
+    const authenticityProcessmentReturn = {};
+
+    try {
+      await this._start();
+      await this._fillAuthenticityForm(
+        controlCode,
+        dateOfIssue,
+        issueTime,
+        typeOfCertificate
+      );
+      await this.__consult();
+    } catch (error) {
+    } finally {
+      await this._robot.close();
+      await this._robot.delay(500 * Math.floor(Math.random() * 5));
+    }
   }
 
   async generateTaxRegularityCertificate() {
