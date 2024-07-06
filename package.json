@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node -r dotenv/config src/index.js"
   },
   "keywords": [],
   "author": "Gabriel Rocha",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "aws-sdk": "^2.1655.0",
     "cpf-cnpj-validator": "^1.0.3",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "puppeteer": "^22.12.1",
     "puppeteer-extra": "^3.3.6",

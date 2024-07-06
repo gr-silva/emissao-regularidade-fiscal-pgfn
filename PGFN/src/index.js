@@ -1,6 +1,8 @@
 const WebRobot = require("../WebRobot/src/WebRobot");
 const selectors = require("../configs/selectors");
 const configs = require("../configs/general");
+const s3Client = require("../AWS/s3Client");
+const path = require("path");
 
 class PGFN {
   constructor(idCodes = [], processmentType = "", timeout = 30000) {
@@ -156,6 +158,7 @@ class PGFN {
 
     for (const idCode of this._idCodes) {
       this._idCode = idCode;
+      const fileName = `Certidao-${this._idCode}.pdf`;
       console.log(this._idCode);
 
       try {
@@ -163,10 +166,14 @@ class PGFN {
         await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
         await this._consultIdCode();
         await this._downloadTaxRegularityCertificate();
+        const s3FileUrl = await s3Client.uploadFile(
+          fileName,
+          path.resolve(String(configs.DOWNLOAD_PATH), fileName)
+        );
 
         idCodesProcessmentReturn[this._idCode] = {
           status: "sucesso",
-          certidao: "http://link.com.br",
+          certidao: s3FileUrl,
           motivo_erro: null,
         };
       } catch (error) {
