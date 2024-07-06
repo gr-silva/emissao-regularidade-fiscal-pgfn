@@ -41,6 +41,8 @@ class PGFN {
       await this._robot.delay(2000);
       return "Site da PGFN acessado com sucesso.";
     } catch (error) {
+      console.log(error);
+      await this._robot.close();
       return await this._start(--LIMITER);
     }
   }
