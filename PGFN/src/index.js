@@ -102,6 +102,7 @@ class PGFN {
     try {
       await this._robot.waitForSelector(netError, 1500);
       await this._robot.refreshPage();
+      await this._robot.delay(1000);
       return await this.__handleNetError();
     } catch (error) {}
   }
