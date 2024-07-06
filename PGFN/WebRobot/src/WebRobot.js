@@ -179,6 +179,22 @@ class WebRobot {
   }
 
   /**
+   * The function `selectOptionFromDropdown` asynchronously selects an option from
+   * a dropdown menu on a web page.
+   * @param selector - The `selector` parameter is a string that represents the CSS
+   * selector of the dropdown element from which you want to select an option.
+   * @param option - The `option` parameter in the `selectOptionFromDropdown`
+   * function represents the value of the option that you want to select from the
+   * dropdown menu identified by the `selector`. This value should match one of the
+   * available options in the dropdown list.
+   */
+  async selectOptionFromDropdown(selector, option) {
+    await this.waitForSelector(selector, this._timeout);
+    const element = await this._page.$(selector);
+    await element.select(option);
+  }
+
+  /**
    * It takes a value and a selector, and then it uses the evaluate function to set the value of the
    * element that matches the selector to the value
    * @param value - The value to set the element to.
