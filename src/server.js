@@ -1,5 +1,7 @@
 const PGFN = require("../PGFN/src/index.js");
 const ValidateCNPJ = require("../PGFN/utils/cnpj/validate-cnpj.js");
+const ClearCNPJ = require("../PGFN/utils/cnpj/clear-cnpj-chars.js");
+const ClearCPF = require("../PGFN/utils/cpf/clear-cpf-chars.js");
 const ValidateCPF = require("../PGFN/utils/cpf/validate-cpf.js");
 const express = require("express");
 const app = express();
@@ -16,10 +18,10 @@ app.post("/gerar-certidoes", async (req, res) => {
   const results = await Promise.all(
     documentNumbers.map(async (document) => {
       if (ValidateCPF(document)) {
-        const pgfn = new PGFN([document], "PF");
+        const pgfn = new PGFN([ClearCPF(document)], "PF");
         return pgfn.generateTaxRegularityCertificate();
       } else if (ValidateCNPJ(document)) {
-        const pgfn = new PGFN([document], "PJ");
+        const pgfn = new PGFN([ClearCNPJ(document)], "PJ");
         return pgfn.generateTaxRegularityCertificate();
       } else {
         return {
