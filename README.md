@@ -18,10 +18,10 @@
 - [x] Mapear seletores do processo
 - [x] Criar funcionalidades iniciais do processo
 - [ ] Realizar testes e correções de bugs das funcionalidades iniciais do processo
-- [ ] Criar funções para publicar PDFs
+- [x] Criar funções para publicar PDFs
 - [ ] Criar rota para iniciar o processo
 
-### Features
+### Próximas Features
 
 - [ ] Implementar paralelismo do robô
 - [ ] Escrever teste de funções utilitárias
