@@ -50,7 +50,7 @@ class PGFN {
 
     try {
       await this._robot.setText(this._idCode, idCodeInput, true);
-      await this._robot.delay(500);
+      await this._robot.delay(1000);
       await this._robot.click(consultButton);
       const { hasError, message } = await this.__handleIdCodeError();
       if (hasError) {
@@ -60,13 +60,9 @@ class PGFN {
       await this.__handleNetError();
       await this.__waitForLoading();
     } catch (error) {
-      if (error.message.includes("mais tarde")) {
-        await this._robot.refreshPage();
-        return await this._consultIdCode((LIMITER = 3));
-      }
-
       if (!LIMITER) throw new Error(error.message);
       await this._robot.refreshPage();
+      await this.__handleNetError();
       return await this._consultIdCode(--LIMITER);
     }
   }
@@ -91,10 +87,11 @@ class PGFN {
         throw new Error(consultMessage);
       }
       await this.__handleNetError();
-      await this._robot.click(newConsultButton);
+      // await this._robot.click(newConsultButton);
     } catch (error) {
       if (!LIMITER) throw new Error(error.message);
       await this._robot.refreshPage();
+      await this.__handleNetError();
       await this._consultIdCode(LIMITER - 1);
       return await this._downloadTaxRegularityCertificate(--LIMITER);
     }
@@ -119,6 +116,7 @@ class PGFN {
       this._selectors.BUTTONS.ISSUE_NEW_CERTIFICATE;
     try {
       await this._robot.waitForSelector(issueNewCertificateButton, 2000);
+      await this._robot.delay(500);
       await this._robot.click(issueNewCertificateButton);
     } catch (error) {}
   }
@@ -146,7 +144,6 @@ class PGFN {
       );
       if (!styleMessage.includes("display: none;")) {
         const message = await this._robot.getElementText(errorMessage);
-        console.error(message);
         return { hasError: true, message: message };
       }
     }
@@ -155,14 +152,14 @@ class PGFN {
 
   async generateTaxRegularityCertificate() {
     const idCodesProcessmentReturn = {};
-    await this._start();
-    await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
 
     for (const idCode of this._idCodes) {
       this._idCode = idCode;
       console.log(this._idCode);
 
       try {
+        await this._start();
+        await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
         await this._consultIdCode();
         await this._downloadTaxRegularityCertificate();
 
@@ -171,21 +168,23 @@ class PGFN {
           certidao: "http://link.com.br",
           motivo_erro: null,
         };
-
-        await this._robot.delay(5000);
       } catch (error) {
+        const errorMessage = error.message
+          .replace(/\n/g, "")
+          .replace("Resultado da Consulta", "")
+          .trim();
+
         idCodesProcessmentReturn[this._idCode] = {
           status: "falha",
           certidao: null,
-          motivo_erro: String(error.message),
+          motivo_erro: errorMessage,
         };
-
-        await this._robot.refreshPage();
-        await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
+      } finally {
+        await this._robot.close();
+        await this._robot.delay(500 * Math.floor(Math.random() * 5));
       }
     }
 
-    await this._robot.close();
     console.log(idCodesProcessmentReturn);
     return idCodesProcessmentReturn;
   }
