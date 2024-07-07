@@ -9,6 +9,10 @@ const SELECTS = {
   TYPE_OF_CERTIFICATE: "#TipoCertidaoStr",
 };
 
+const TABLES = {
+  AUTHENTICITY_RESULT: "#main-container > div > table > tbody > tr > td",
+};
+
 const BUTTONS = {
   CONSULT: "#validar",
   ISSUE_NEW_CERTIFICATE: "#FrmSelecao > a:nth-child(6)",
@@ -24,6 +28,8 @@ const MODALS = {
 const TITLES = {
   RESULT_OF_CONSULT:
     "#main-container > div > table > tbody > tr > td > h3:nth-child(2)",
+  RESULT_OF_AUTHENTICITY:
+    "#main-container > div > table > tbody > tr > td > h3",
 };
 
 const MESSAGES = {
@@ -42,4 +48,5 @@ module.exports = {
   LOADING,
   TITLES,
   SELECTS,
+  TABLES,
 };

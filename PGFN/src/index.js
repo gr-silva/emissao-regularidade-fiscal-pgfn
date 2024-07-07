@@ -161,7 +161,10 @@ class PGFN {
   }
 
   async __waitForResultOfConsult() {
-    const resultOfConsultTitle = this._selectors.TITLES.RESULT_OF_CONSULT;
+    const resultOfConsultTitle = !this._verifyAuthenticity
+      ? this._selectors.TITLES.RESULT_OF_CONSULT
+      : this._selectors.TITLES.RESULT_OF_AUTHENTICITY;
+
     await this._robot.waitForSelector(resultOfConsultTitle);
   }
 
@@ -203,6 +206,13 @@ class PGFN {
     }
     return { hasError: false, message: "" };
   }
+  async _getAuthenticityResult() {
+    const authenticityResult = this._selectors.TABLES.AUTHENTICITY_RESULT;
+    await this.__waitForResultOfConsult();
+    let result = await this._robot.getElementText(authenticityResult);
+    result = result.split("\n").filter((item) => item.trim() !== "");
+    return result[result.length - 3].trim();
+  }
 
   async confirmAuthenticityOfTaxRegularity(
     controlCode,
@@ -221,11 +231,34 @@ class PGFN {
         typeOfCertificate
       );
       await this.__consult();
+      const authenticityResult = await this._getAuthenticityResult();
+
+      if (authenticityResult.includes() === "não é autêntica")
+        throw new Error(authenticityResult);
+
+      authenticityProcessmentReturn[this._documentNumber] = {
+        codigo_controle: controlCode,
+        data_emissao: dateOfIssue,
+        hora_emissao: issueTime,
+        status: "sucesso",
+        motivo_erro: null,
+        observacao: authenticityResult,
+      };
     } catch (error) {
+      authenticityProcessmentReturn[this._documentNumber] = {
+        codigo_controle: controlCode,
+        data_emissao: dateOfIssue,
+        hora_emissao: issueTime,
+        status: "falha",
+        motivo_erro: error.message,
+        observacao: null,
+      };
     } finally {
       await this._robot.close();
       await this._robot.delay(500 * Math.floor(Math.random() * 5));
     }
+
+    return authenticityProcessmentReturn;
   }
 
   async generateTaxRegularityCertificate() {
