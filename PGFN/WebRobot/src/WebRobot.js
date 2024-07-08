@@ -26,25 +26,25 @@ class WebRobot {
   }
 
   /**
-   * The function uses Puppeteer to launch a browser, create a new page with a
-   * random user agent, and navigate to a specified URL.
+   * The function uses Puppeteer to start a browser, set a random user agent, and
+   * navigate to a specified page URL.
    * @param pageUrl - The `pageUrl` parameter is the URL of the webpage that you
    * want to navigate to using Puppeteer. It is the address of the webpage you want
    * to load and interact with programmatically.
    * @param browserOptions - Browser options are configurations that can be passed
    * to the puppeteer.launch() method when launching a new browser instance. These
    * options can include settings such as headless mode, user data directory, proxy
-   * settings, executable path, viewport size, etc.
-   * @param [waitUntilInfo=networkidle0] - The `waitUntilInfo` parameter in the
+   * settings, and more.
+   * @param [waitUntilInfo=networkidle2] - The `waitUntilInfo` parameter in the
    * `start` function specifies when the navigation should be considered complete.
-   * In this case, it is set to "networkidle0", which means the navigation is
-   * considered complete when there are no more than 0 network connections for at
+   * In this case, it is set to "networkidle2", which means that navigation is
+   * considered complete when there are no more than 2 network connections for at
    * least 500 ms. This
    * @returns The `start` function returns a Promise that resolves to the result of
    * the `_page.goto` method, which navigates the browser to the specified
    * `pageUrl` with the specified `waitUntilInfo` option.
    */
-  async start(pageUrl, browserOptions, waitUntilInfo = "networkidle0") {
+  async start(pageUrl, browserOptions, waitUntilInfo = "networkidle2") {
     await puppeteer.use(StealthPlugin());
     this._browser = await puppeteer.launch(browserOptions);
     this._process = await this._browser.process();
@@ -254,7 +254,8 @@ class WebRobot {
    * @returns The browser is being closed.
    */
   async close() {
-    return this._browser.close();
+    await this._browser.disconnect();
+    return await this._browser.close();
   }
 
   /**
