@@ -121,15 +121,28 @@ fetch("http://localhost:3000/gerar-certidoes", {
 - [x] Criar funções utilitárias para limpeza de caracteres não numéricos do CNPJ e CPF
 - [x] Mapear seletores do processo
 - [x] Criar funcionalidades iniciais do processo
-- [ ] Realizar testes e correções de bugs das funcionalidades iniciais do processo
+- [x] Realizar testes e correções de bugs das funcionalidades iniciais do processo
 - [x] Criar funções para publicar PDFs
-- [ ] Verificar permissões do Bucket S3
+- [x] Verificar permissões do Bucket S3
 - [x] Criar rota para iniciar o processo
+- [x] Implementar paralelismo do robô
+- [x] Criar processo de confirmação de autenticidade das certidões
+- [x] Realizar testes e correções de bugs das funcionalidades iniciais do processo de autenticidade
+- [ ] Documentar APIs
 - [ ] Atualizar README com informações do processo de Confirmação de Autenticidade
 
-### Próximas Features
+### Requisitos
 
-- [x] Implementar paralelismo do robô
-- [ ] Escrever teste de funções utilitárias
-- [ ] Escrever testes das funcionalidades do robô
-- [x] Criar processo de confirmação de autenticidade das certidões
+[x] Receber array de CPF/CNPJ
+[x] Validar CPF/CNPJ recebido
+[x] Realizar processamento do CPF/CNPJ
+[x] Publicar PDF da certidão e deixar acessível com link para download
+[x] Retornar JSON com corpo da requisição
+[x] Gestão de erros
+[x] Paralelismo
+[x] Documentação do Código
+[x] Publicar no GitHub
+[x] Endpoint para confirmar autenticidade
+[x] Criar a automação de confirmar autenticidade
+[x] Levantar os requisitos
+[ ] Documentar endpoint
