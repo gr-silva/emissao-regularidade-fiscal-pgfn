@@ -13,7 +13,7 @@ module.exports = (app) => {
         .status(400)
         .json({ error: "O input deve ser um array de CPFs ou CNPjs." });
     }
-    const chunkTaxPayersId = chunkArray(taxPayersId, 4);
+    const chunkTaxPayersId = chunkArray(taxPayersId, 2);
     const results = {};
 
     for (const chunkedTaxPayerId of chunkTaxPayersId) {
@@ -40,7 +40,6 @@ module.exports = (app) => {
         Object.assign(results, result);
       });
     }
-
     res.json(results);
   });
 };
