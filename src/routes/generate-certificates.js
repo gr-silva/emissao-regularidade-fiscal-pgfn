@@ -1,4 +1,10 @@
-modules.export = (app) => {
+const PGFN = require("../../PGFN/src/index.js");
+const ValidateCNPJ = require("../../PGFN/utils/cnpj/validate-cnpj.js");
+const ClearCNPJ = require("../../PGFN/utils/cnpj/clear-cnpj-chars.js");
+const ClearCPF = require("../../PGFN/utils/cpf/clear-cpf-chars.js");
+const ValidateCPF = require("../../PGFN/utils/cpf/validate-cpf.js");
+
+module.exports = (app) => {
   app.post("/gerar-certidoes", async (req, res) => {
     const { taxPayersId } = req.body;
     if (!Array.isArray(taxPayersId)) {
