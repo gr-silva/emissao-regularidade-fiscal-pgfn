@@ -49,6 +49,9 @@ emissao-regularidade-fiscal-pgfn/
 │     └── WebRobot.js # Funções e lógicas abstraídas do Puppeteer
 │   └── index.js # Arquivo de inicialização da classe WebRobot
 ├── src/
+│ └── routes
+│   └── confirm-certificates.js # Arquivo de rota para confirmar certidões
+│   └── generate-certificates.js # Arquivo de rota para gerar certidões
 │ └── server.js # Arquivo de inicialização da API do servidor com Express
 ```
 
@@ -122,10 +125,11 @@ fetch("http://localhost:3000/gerar-certidoes", {
 - [x] Criar funções para publicar PDFs
 - [ ] Verificar permissões do Bucket S3
 - [x] Criar rota para iniciar o processo
+- [ ] Atualizar README com informações do processo de Confirmação de Autenticidade
 
 ### Próximas Features
 
 - [x] Implementar paralelismo do robô
 - [ ] Escrever teste de funções utilitárias
 - [ ] Escrever testes das funcionalidades do robô
-- [ ] Criar processo de confirmação de autenticidade das certidões
+- [x] Criar processo de confirmação de autenticidade das certidões
