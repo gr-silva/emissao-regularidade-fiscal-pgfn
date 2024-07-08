@@ -191,7 +191,7 @@ class WebRobot {
   async selectOptionFromDropdown(selector, option) {
     await this.waitForSelector(selector, this._timeout);
     const element = await this._page.$(selector);
-    await element.select(option);
+    await element.type(option);
   }
 
   /**
