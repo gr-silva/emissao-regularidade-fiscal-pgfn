@@ -1,6 +1,7 @@
 const path = require("path");
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
 const fs = require("fs");
 
 class WebRobot {
@@ -45,7 +46,6 @@ class WebRobot {
    * `pageUrl` with the specified `waitUntilInfo` option.
    */
   async start(pageUrl, browserOptions, waitUntilInfo = "networkidle2") {
-    await puppeteer.use(StealthPlugin());
     this._browser = await puppeteer.launch(browserOptions);
     this._process = await this._browser.process();
     this._page = await this._browser.newPage();

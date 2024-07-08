@@ -46,11 +46,11 @@ class PGFN {
         return "CPF ou CNPJ Inválido.";
       }
       await this._robot.start(url, configs.BROWSER_OPTIONS);
+      await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
       await this._robot.waitForSelector(documentNumberInput);
       await this._robot.delay(2000);
       return "Site da PGFN acessado com sucesso.";
     } catch (error) {
-      console.log(error);
       await this._robot.close();
       return await this._start(--LIMITER);
     }
@@ -72,21 +72,22 @@ class PGFN {
       await this.__waitForLoading();
     } catch (error) {
       if (!LIMITER) throw new Error(error.message);
-      await this._robot.refreshPage();
-      await this.__handleNetError();
+      await this._robot.close();
+      await this._start(LIMITER - 1);
       return await this._consultDocumentNumber(--LIMITER);
     }
   }
 
   async _downloadTaxRegularityCertificate(LIMITER = 3) {
-    if (!LIMITER) throw new Error("Erro ao consultar certidão.");
-    const newConsultButton = this._selectors.BUTTONS.NEW_CONSULT;
+    if (!LIMITER)
+      throw new Error("O portal apresentou falhas ao emitir certidão.");
     const message = this._selectors.MESSAGES.RESULT_OF_CONSULT;
 
     try {
       await this.__reissueCertificate();
       await this.__waitForLoading();
       await this._robot.delay(1000);
+      await this.__waitForResultOfConsult();
       const consultMessage = await this._robot.getElementInnerText(message);
       if (consultMessage.includes("certidão foi emitida com sucesso")) {
         await this._robot.verifyDownload(
@@ -97,12 +98,10 @@ class PGFN {
         LIMITER = 0;
         throw new Error(consultMessage);
       }
-      await this.__handleNetError();
-      // await this._robot.click(newConsultButton);
     } catch (error) {
       if (!LIMITER) throw new Error(error.message);
-      await this._robot.refreshPage();
-      await this.__handleNetError();
+      await this._robot.close();
+      await this._start(LIMITER - 1);
       await this._consultDocumentNumber(LIMITER - 1);
       return await this._downloadTaxRegularityCertificate(--LIMITER);
     }
@@ -162,12 +161,21 @@ class PGFN {
     } catch (error) {}
   }
 
-  async __waitForResultOfConsult() {
+  async __waitForResultOfConsult(LIMITER = 60) {
     const resultOfConsultTitle = !this._verifyAuthenticity
       ? this._selectors.TITLES.RESULT_OF_CONSULT
       : this._selectors.TITLES.RESULT_OF_AUTHENTICITY;
 
-    await this._robot.waitForSelector(resultOfConsultTitle);
+    console.log("Aguardando resultado da consulta...");
+    await this._robot.delay(1000);
+    while (!(await this._robot.findElement(resultOfConsultTitle)) && LIMITER) {
+      return await this.__waitForResultOfConsult(--LIMITER);
+    }
+
+    if (!LIMITER)
+      throw new Error(
+        "Portal não está respondendo. Tente novamente mais tarde."
+      );
   }
 
   async __reissueCertificate() {
@@ -195,7 +203,7 @@ class PGFN {
     const errorModal = this._selectors.MODALS.ERROR;
     const errorMessage = this._selectors.MESSAGES.ERROR_MESSAGE;
     console.log("Verificando erros no CPF ou CNPJ...");
-    await this._robot.delay(1000);
+    await this._robot.delay(1500);
     if (await this._robot.findElement(errorModal)) {
       const styleMessage = await this._robot.getElementAttribute(
         errorModal,
@@ -270,7 +278,6 @@ class PGFN {
 
     try {
       await this._start();
-      await this._robot.setDownloadPath(configs.DOWNLOAD_PATH);
       await this._consultDocumentNumber();
       await this._downloadTaxRegularityCertificate();
       const s3FileUrl = await s3Client.uploadFile(
@@ -296,7 +303,7 @@ class PGFN {
       };
     } finally {
       await this._robot.close();
-      await this._robot.delay(500 * Math.floor(Math.random() * 5));
+      await this._robot.delay(1000 * Math.floor(Math.random() * 5));
     }
 
     return documentNumberProcessmentReturn;
