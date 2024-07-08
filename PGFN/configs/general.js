@@ -24,10 +24,12 @@ const BROWSER_OPTIONS = {
   timeout: 3000,
   ignoreDefaultArgs: ["--disable-extensions", "--enable-automation"],
   args: [
-    "--start-maximized",
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-infobars",
+    "--window-position=0,0",
     "--ignore-certificate-errors",
-    "--disable-web-security",
-    "--disable-features=IsolateOrigins,site-per-process",
+    "--ignore-certificate-errors-spki-list",
   ],
 };
 
