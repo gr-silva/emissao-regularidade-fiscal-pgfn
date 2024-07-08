@@ -7,7 +7,9 @@ const Joi = require("joi");
 
 const certificateSchema = Joi.object({
   control_code: Joi.string().required(),
-  date_of_issue: Joi.string().required(), // verificar se pode incluir formato de data aceito
+  date_of_issue: Joi.string()
+    .pattern(/^\d{2}\/\d{2}\/\d{4}$/)
+    .required(),
   issue_time: Joi.string()
     .pattern(/^\d{2}:\d{2}:\d{2}$/)
     .required(),
@@ -15,7 +17,7 @@ const certificateSchema = Joi.object({
 });
 
 const dataSchema = Joi.object().pattern(
-  Joi.string().length(11).pattern(/^\d+$/), // Chaves são strings de 11 dígitos numéricos
+  Joi.string().pattern(/^\d{11}|\d{14}$/),
   certificateSchema
 );
 
@@ -27,7 +29,7 @@ module.exports = (app) => {
       return res.status(400).json({ error: error.details });
     }
     const results = await Promise.all(
-      taxPayersIdObject.map(async (taxPayerId) => {
+      Object.keys(taxPayersIdObject).map(async (taxPayerId) => {
         const controlCode = taxPayersIdObject[taxPayerId].control_code;
         const dateOfIssue = taxPayersIdObject[taxPayerId].date_of_issue;
         const issueTime = taxPayersIdObject[taxPayerId].issue_time;
@@ -35,7 +37,9 @@ module.exports = (app) => {
           taxPayersIdObject[taxPayerId].type_of_certificate;
 
         if (ValidateCPF(taxPayerId)) {
-          const pgfn = new PGFN([ClearCPF(taxPayerId)], "PF");
+          const pgfn = new PGFN([ClearCPF(taxPayerId)], "PF", {
+            verifyAuthenticity: true,
+          });
           return pgfn.confirmAuthenticityOfTaxRegularity(
             controlCode,
             dateOfIssue,
@@ -43,7 +47,9 @@ module.exports = (app) => {
             typeOfCertificate
           );
         } else if (ValidateCNPJ(taxPayerId)) {
-          const pgfn = new PGFN([ClearCNPJ(taxPayerId)], "PJ");
+          const pgfn = new PGFN([ClearCNPJ(taxPayerId)], "PJ", {
+            verifyAuthenticity: true,
+          });
           return pgfn.confirmAuthenticityOfTaxRegularity(
             controlCode,
             dateOfIssue,
