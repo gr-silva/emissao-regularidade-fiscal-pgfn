@@ -8,8 +8,7 @@ class PGFN {
   constructor(
     documentNumber = "",
     processmentType = "",
-    timeout = 30000,
-    verifyAuthenticity = false
+    { timeout = 30000, verifyAuthenticity = false } = {}
   ) {
     this._timeout = timeout;
     this._browser = "";
@@ -116,33 +115,36 @@ class PGFN {
     typeOfCertificate
   ) {
     await this.__insertDocumentNumber();
-    await this.__insertControlCode();
-    await this.__insertDateOfIssue();
-    await this.__insertIssueTime();
-    await this.__selectTypeOfCertificate();
+    await this.__insertControlCode(controlCode);
+    await this.__insertDateOfIssue(dateOfIssue);
+    await this.__insertIssueTime(issueTime);
+    await this.__selectTypeOfCertificate(typeOfCertificate);
     await this.__consult();
   }
 
   async __insertDocumentNumber() {
     const documentNumberInput = this._selectors.INPUTS.ID_CODE;
-    await this._robot.setText(this._documentNumber, documentNumberInput, true);
+    await this._robot.setValue(this._documentNumber, documentNumberInput);
   }
   async __insertControlCode(controlCode) {
     const controlCodeInput = this._selectors.INPUTS.CONTROL_CODE;
-    await this._robot.setText(controlCode, controlCodeInput, true);
+    await this._robot.setValue(controlCode, controlCodeInput);
   }
   async __insertDateOfIssue(dateOfIssue) {
     const dateOfIssueInput = this._selectors.INPUTS.DATE_OF_ISSUE;
-    await this._robot.setText(dateOfIssue, dateOfIssueInput, true);
+    await this._robot.setValue(dateOfIssue, dateOfIssueInput);
   }
   async __insertIssueTime(issueTime) {
     const issueTimeInput = this._selectors.INPUTS.ISSUE_TIME;
-    await this._robot.setText(issueTime, issueTimeInput, true);
+    await this._robot.setValue(issueTime, issueTimeInput);
   }
 
   async __selectTypeOfCertificate(typeOfCertificate) {
     const typeOfCertificateSelect = this._selectors.SELECTS.TYPE_OF_CERTIFICATE;
-    await this._robot.select(typeOfCertificate, typeOfCertificateSelect);
+    await this._robot.selectOptionFromDropdown(
+      typeOfCertificateSelect,
+      typeOfCertificate
+    );
   }
 
   async __consult() {
@@ -230,7 +232,6 @@ class PGFN {
         issueTime,
         typeOfCertificate
       );
-      await this.__consult();
       const authenticityResult = await this._getAuthenticityResult();
 
       if (authenticityResult.includes() === "não é autêntica")
