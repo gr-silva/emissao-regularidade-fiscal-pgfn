@@ -4,6 +4,7 @@
 
 - [Emissão de Regularidade Fiscal](docs/generate-certificates.md)
 - [Confirmação de Autenticidade](docs/confirm-authenticity.md)
+- [API](docs/api.md)
 
 ## Estrutura do Projeto
 
