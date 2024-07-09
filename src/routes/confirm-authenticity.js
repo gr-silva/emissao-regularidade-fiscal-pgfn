@@ -24,18 +24,11 @@ const dataSchema = Joi.object().pattern(
 
 /**
  * @swagger
- * tags:
- *   name: Autenticidade
- *   description: APIs para confirmar autenticidade das certidões de regularidade fiscal
- */
-
-/**
- * @swagger
  * /confirmar-autenticidade:
  *   post:
  *     summary: Confirma a autenticidade das certidões de regularidade fiscal para CPFs e CNPJs.
  *     description: Recebe um JSON contendo objetos de CPFs e/ou CNPJs com suas respectivas certidões fiscais e verifica a autenticidade.
- *     tags: [Autenticidade]
+ *     tags: [Certidoes]
  *     requestBody:
  *       required: true
  *       content:
