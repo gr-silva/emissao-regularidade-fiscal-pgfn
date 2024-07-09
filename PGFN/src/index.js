@@ -1,7 +1,7 @@
-const WebRobot = require("../WebRobot/src/WebRobot");
+const WebRobot = require("../WebRobot/src/web-robot");
 const selectors = require("../configs/selectors");
 const configs = require("../configs/general");
-const s3Client = require("../AWS/s3Client");
+const s3Client = require("../AWS/s3-client");
 const path = require("path");
 
 class PGFN {
