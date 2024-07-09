@@ -4,6 +4,7 @@
 
 - [Emissão de Regularidade Fiscal](docs/generate-certificates.md)
 - [Confirmação de Autenticidade](docs/confirm-authenticity.md)
+- [API](docs/api.md)
 
 ## Estrutura do Projeto
 
@@ -82,7 +83,7 @@ npm install
 - [x] Criar processo de confirmação de autenticidade das certidões
 - [x] Realizar testes e correções de bugs das funcionalidades iniciais do processo de autenticidade
 - [x] Documentar APIs
-- [ ] Atualizar README com informações do processo de Confirmação de Autenticidade
+- [x] Atualizar README com informações do processo de Confirmação de Autenticidade
 
 ### Requisitos do Projeto
 
