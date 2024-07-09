@@ -280,6 +280,7 @@ class PGFN {
       await this._start();
       await this._consultDocumentNumber();
       await this._downloadTaxRegularityCertificate();
+      await this._robot.delay(500);
       const s3FileUrl = await s3Client.uploadFile(
         fileName,
         path.resolve(String(configs.DOWNLOAD_PATH), fileName)
