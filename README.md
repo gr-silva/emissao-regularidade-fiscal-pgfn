@@ -66,6 +66,14 @@ cd regularidade-fiscal-pgfn
 npm install
 ```
 
+3. Renomeie o arquivo `.env.example` para `.env`
+
+```bash
+mv .env.example .env
+```
+
+4. Insira as credenciais no arquivo `.env`, de acordo com as variáveis que foram solicitadas no `.env.example`.
+
 ## Tarefas
 
 ### A Fazer
