@@ -128,7 +128,7 @@ module.exports = (app) => {
         return res.status(400).json({ error: error.details });
       }
 
-      const chunkTaxPayersId = chunkArray(Object.keys(taxPayersIdObject), 2);
+      const chunkTaxPayersId = chunkArray(Object.keys(taxPayersIdObject), 4);
       const results = {};
 
       for (const chunkedTaxPayerId of chunkTaxPayersId) {
