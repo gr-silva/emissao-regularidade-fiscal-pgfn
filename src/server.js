@@ -5,7 +5,7 @@ const confirmAuthenticityRoute = require("./routes/confirm-authenticity.js");
 
 const app = express();
 app.use(express.json());
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 generateCertificateRoute(app);
 confirmAuthenticityRoute(app);
