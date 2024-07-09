@@ -242,7 +242,7 @@ class PGFN {
       );
       const authenticityResult = await this._getAuthenticityResult();
 
-      if (authenticityResult.includes() === "não é autêntica")
+      if (authenticityResult.includes("não é autêntica"))
         throw new Error(authenticityResult);
 
       authenticityProcessmentReturn[this._documentNumber] = {
