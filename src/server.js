@@ -1,9 +1,11 @@
 const express = require("express");
+const { swaggerUi, specs } = require("./configs/swagger-config");
 const generateCertificateRoute = require("./routes/generate-certificates.js");
 const confirmAuthenticityRoute = require("./routes/confirm-authenticity.js");
-const app = express();
 
+const app = express();
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 generateCertificateRoute(app);
 confirmAuthenticityRoute(app);
