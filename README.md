@@ -133,16 +133,16 @@ fetch("http://localhost:3000/gerar-certidoes", {
 
 ### Requisitos
 
-[x] Receber array de CPF/CNPJ
-[x] Validar CPF/CNPJ recebido
-[x] Realizar processamento do CPF/CNPJ
-[x] Publicar PDF da certidão e deixar acessível com link para download
-[x] Retornar JSON com corpo da requisição
-[x] Gestão de erros
-[x] Paralelismo
-[x] Documentação do Código
-[x] Publicar no GitHub
-[x] Endpoint para confirmar autenticidade
-[x] Criar a automação de confirmar autenticidade
-[x] Levantar os requisitos
-[ ] Documentar endpoint
+- [x] Receber array de CPF/CNPJ
+- [x] Validar CPF/CNPJ recebido
+- [x] Realizar processamento do CPF/CNPJ
+- [x] Publicar PDF da certidão e deixar acessível com link para download
+- [x] Retornar JSON com corpo da requisição
+- [x] Gestão de erros
+- [x] Paralelismo
+- [x] Documentação do Código
+- [x] Publicar no GitHub
+- [x] Endpoint para confirmar autenticidade
+- [x] Criar a automação de confirmar autenticidade
+- [x] Levantar os requisitos
+- [ ] Documentar endpoint
